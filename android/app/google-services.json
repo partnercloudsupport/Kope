@@ -1,0 +1,93 @@
+{
+  "project_info": {
+    "project_number": "445398245486",
+    "firebase_url": "https://kope-b753d.firebaseio.com",
+    "project_id": "kope-b753d",
+    "storage_bucket": "kope-b753d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:445398245486:android:a7667ea94eed5723",
+        "android_client_info": {
+          "package_name": "com.example.kope"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "445398245486-n6052ncvtagtfjk5b3tcmj6hv5hrjcpr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBt5nWMF3z7qmDWzEKNJ96UmkIcAMveNpE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:445398245486:android:70fadcfe93416526",
+        "android_client_info": {
+          "package_name": "com.kope.kope"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "445398245486-btal3kji45q41pbus48vpehknaki20en.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kope.kope",
+            "certificate_hash": "5c51c0d2cbfb4273b69eebff4e7dadf8c36c6d03"
+          }
+        },
+        {
+          "client_id": "445398245486-n6052ncvtagtfjk5b3tcmj6hv5hrjcpr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBt5nWMF3z7qmDWzEKNJ96UmkIcAMveNpE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "445398245486-n6052ncvtagtfjk5b3tcmj6hv5hrjcpr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "445398245486-epld8ni2cb980nqfbhd016nhi0l9c8un.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kope.kope"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
