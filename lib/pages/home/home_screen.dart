@@ -12,14 +12,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     controller = new TabController(vsync: this, length: 5);
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     controller.dispose();
   }

@@ -1,9 +1,21 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kope/cloud/locals/locals.dart';
 import 'package:kope/utils/my_navigator.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfileDetails extends StatelessWidget {
+class ProfileDetails extends StatefulWidget {
+  @override
+  _ProfileDetailsState createState() => _ProfileDetailsState();
+}
 
-  SizedBox buildLoginButton(BuildContext context) {
+class _ProfileDetailsState extends State<ProfileDetails> {
+  SharedPreferences prefs;
+  String uid, username, nom, addresse, profession, tel, email, _img, ville;
+  Firestore firestore;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  BuildContext context;
+  SizedBox buildLoginButton() {
     return SizedBox(
       height: 30.0,
 //      width: 200.0,
@@ -12,8 +24,7 @@ class ProfileDetails extends StatelessWidget {
           MyNavigator.gotTo(context, '/profile');
         },
         color: Colors.blue,
-        shape:
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
         child: Text(
           'Edit Profile',
           style: TextStyle(color: Colors.white),
@@ -22,79 +33,187 @@ class ProfileDetails extends StatelessWidget {
     );
   }
 
-  bodyWidget(BuildContext context) => Stack(
-    children: <Widget>[
-      Positioned(
-        height: MediaQuery.of(context).size.height / 1.5,
-        width: MediaQuery.of(context).size.width - 20,
-        left: 10.0,
-        top: MediaQuery.of(context).size.height * 0.1,
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(
-                height: 80.0,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  @override
+  void initState() {
+    super.initState();
+    init();
+  }
+
+  bodyWidget() {
+    return ListView(
+      children: <Widget>[
+        Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Material(
+                color: Colors.white,
+                elevation: 0.8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      'Username',
-                      style:
-                      TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                    SizedBox(
+                      height: 10.0,
                     ),
-                    buildLoginButton(context)
+                    Container(
+                      height: 100.0,
+                      width: 100.0,
+                      child: _img == null
+                          ? Icon(
+                              Icons.account_circle,
+                              color: Colors.grey,
+                              size: 100.0,
+                            )
+                          : Image(
+                              image: NetworkImage(_img),
+                              fit: BoxFit.cover,
+                            ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Text(
+                            username == null ? 'Username' : username,
+                            style: TextStyle(
+                                fontSize: 20.0, fontWeight: FontWeight.bold),
+                          ),
+                          buildLoginButton()
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    Text(nom == null ? "Nom Complet" : nom),
+                    SizedBox(
+                      height: 25.0,
+                    ),
+                    Text(addresse = null ? "Adresse" : addresse),
+                    SizedBox(
+                      height: 25.0,
+                    ),
+                    Text(
+                      profession == null ? "Profession" : profession,
+                    ),
+                    SizedBox(
+                      height: 25.0,
+                    ),
+                    Text(
+                      tel == null ? "N° Tel" : tel,
+                    ),
+                    SizedBox(
+                      height: 25.0,
+                    ),
+                    Text(
+                      email == null ? "E-mail" : email,
+                    ),
+                    SizedBox(
+                      height: 25.0,
+                    )
                   ],
                 ),
               ),
-              SizedBox(height: 50.0,),
-              Text("Nom Complet"),
-              SizedBox(height: 25.0,),
-              Text("Adresse"),
-              SizedBox(height: 25.0,),
-              Text(
-                "Profession",
-              ),
-              SizedBox(height: 25.0,),
-              Text(
-                "N° Tel",
-              ),
-              SizedBox(height: 25.0,),
-              Text(
-                "E-mail",
-              )
-            ],
-          ),
+            ),
+          ],
         ),
-      ),
-      Align(
-        alignment: Alignment.topCenter,
-        child: Hero(
-            tag: 'tag',
-            child: Container(
-              height: 200.0,
-              width: 200.0,
-              child: Icon(
-                Icons.account_circle,
-                color: Colors.grey,
-                size: 100.0,
-              ),
-            )),
-      )
-    ],
-  );
+      ],
+    );
+  }
+
+  void init() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      uid = (prefs.getString('userId'));
+      // _loadUserData();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    this.context = context;
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.grey[200],
-      body: bodyWidget(context),
+      body: bodyWidget(),
     );
+  }
+
+  Future _loadUserData() async {
+    print(uid);
+    firestore = Firestore.instance;
+    await firestore
+        .collection('user')
+        .document(uid)
+        .get()
+        .then((DocumentSnapshot query) {
+      if (query.exists) {
+        username = query.data["username"];
+        profession = query.data["profession"];
+        nom = query.data["nom"];
+        addresse = query.data["province"];
+        ville = query.data["ville"];
+        tel = query.data["tel"];
+        email = query.data["email"];
+        _img = query.data["imagePath"];
+      }
+    });
+    setState(() {
+      username = username;
+      profession = profession;
+      nom = nom;
+      addresse = addresse;
+      // if (addresse != null) _loadAddresse(addresse);
+      ville = ville;
+      tel = tel;
+      email = email;
+      _img = _img;
+    });
+  }
+
+  Future _loadAddresse(String provinceKey) async {
+    String key = null;
+    await firestore
+        .collection("province")
+        .document(provinceKey)
+        .get()
+        .then((DocumentSnapshot query) {
+      if (query.exists) {
+        addresse = ville;
+        addresse = addresse + ", " + query.data["name"];
+        key = query.data["pays"];
+      }
+    }).catchError((e) {
+      print(e);
+      Locals.showErrorSnackbar(
+          "Une erreur s'est produite reessayer", _scaffoldKey);
+    });
+    setState(() {
+      addresse = addresse;
+      if (key != null) _loadPays(key);
+    });
+  }
+
+  Future _loadPays(String paysKey) async {
+    await firestore
+        .collection("pays")
+        .document(paysKey)
+        .get()
+        .then((DocumentSnapshot query) {
+      if (query.exists) {
+        addresse = addresse + ", " + query.data["name"];
+      }
+    }).catchError((e) {
+      print(e);
+      Locals.showErrorSnackbar(
+          "Une erreur s'est produite reessayer", _scaffoldKey);
+    });
+    setState(() {
+      addresse = addresse;
+    });
   }
 }
