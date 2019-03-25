@@ -1,5 +1,8 @@
 import 'package:kope/pages/widgets/categorie_menu.dart';
+<<<<<<< HEAD
 import 'package:kope/pages/profile/profile_details.dart';
+=======
+>>>>>>> d6cbada00ed8772f42b0bf6fafc946a248621325
 import 'package:flutter/material.dart';
 import 'package:kope/utils/my_navigator.dart';
 
@@ -67,7 +70,9 @@ class _HomeScreenState extends State<HomeScreen>
           new ListTile(
             leading: Icon(Icons.storage),
             title: Text('Mes Stockages'),
-            onTap: () {},
+            onTap: () {
+              MyNavigator.gotTo(context, "/storage");
+            },
           ),
           Spacer(),
           Divider(),

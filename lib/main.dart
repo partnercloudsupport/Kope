@@ -7,7 +7,12 @@ import 'package:kope/pages/product/add_product.dart';
 import 'package:kope/pages/profile/profile_screen.dart';
 import 'package:kope/pages/splash_screen.dart';
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:kope/pages/profile/profile_details.dart';
+=======
+import 'package:kope/pages/stockage/storage_screen.dart';
+import 'package:kope/pages/widgets/profile_details.dart';
+>>>>>>> d6cbada00ed8772f42b0bf6fafc946a248621325
 
 var routes = <String, WidgetBuilder>{
   "/home": (BuildContext context) => HomeScreen(),
@@ -18,6 +23,7 @@ var routes = <String, WidgetBuilder>{
   "/profile": (BuildContext context) => ProfileScreen(),
   "/profileDetlais": (BuildContext context) => ProfileDetails(),
   "/product": (BuildContext context) => AddProduct(),
+  "/storage": (BuildContext context) => StorageScreen(),
 };
 void main() => runApp(MyApp());
 

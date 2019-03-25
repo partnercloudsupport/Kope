@@ -42,11 +42,11 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          Container(
-            decoration: BoxDecoration(color: Colors.redAccent,
-                image: DecorationImage(image: AssetImage("assets/images/back.jpg"), fit: BoxFit.cover)
-            ),
-          ),
+          // Container(
+          //   decoration: BoxDecoration(color: Colors.redAccent,
+          //       image: DecorationImage(image: AssetImage("assets/images/back.jpg"), fit: BoxFit.cover)
+          //   ),
+          // ),
           Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
