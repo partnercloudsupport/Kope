@@ -7,7 +7,7 @@ import 'package:kope/pages/product/add_product.dart';
 import 'package:kope/pages/profile/profile_screen.dart';
 import 'package:kope/pages/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:kope/pages/widgets/profile_details.dart';
+import 'package:kope/pages/profile/profile_details.dart';
 
 var routes = <String, WidgetBuilder>{
   "/home": (BuildContext context) => HomeScreen(),

@@ -29,6 +29,43 @@ class Locals {
     }
   }
 
+  static showSuccess(BuildContext context) {
+    return showDialog(
+        context: context,
+        child: SimpleDialog(
+          contentPadding: EdgeInsets.all(40.0),
+          children: <Widget>[
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Material(
+                  elevation: 10.0,
+                  borderRadius: BorderRadius.circular(50.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                    Icons.check,
+                    color: Colors.green,
+                    size: 80.0,
+                  ),
+                  )
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Operation a reussie",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                )
+              ],
+            )
+          ],
+        ));
+  }
+
   static showErrorSnackbar(String message, GlobalKey<ScaffoldState> key) {
     key.currentState.showSnackBar(
       SnackBar(content: Text(message)),

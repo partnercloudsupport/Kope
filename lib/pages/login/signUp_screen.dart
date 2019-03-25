@@ -24,6 +24,7 @@ class _SignScreenState extends State<SignScreen> {
   bool isObscureText = true;
   String verificationId;
   FirebaseAuth _auth = FirebaseAuth.instance;
+  User user;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
@@ -167,28 +168,28 @@ class _SignScreenState extends State<SignScreen> {
                   decoration: InputDecoration(
                       prefixIcon: Icon(Icons.perm_identity), labelText: 'Nom'),
 //                  validator:(value)=> Locals.validUsername(value),
-                  onSaved: (val) => username = val.toLowerCase(),
+                  onSaved: (val) => username = val.toLowerCase().trim(),
                 ),
 //                SizedBox(height: 10.0,),
                 TextFormField(
                   keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
                       prefixIcon: CountryCodePicker(
-                      initialSelection: 'CD',
-                      favorite: ['+243','CD'],
-                      onChanged: (CountryCode countryCode){
-                        cCode = countryCode.toString();
-                      },
-                    ),
+                        initialSelection: 'CD',
+                        favorite: ['+243', 'CD'],
+                        onChanged: (CountryCode countryCode) {
+                          cCode = countryCode.toString();
+                        },
+                      ),
                       hintText: 'Numero Tel'),
                   validator: (value) => Locals.validateMobile(value),
-                  onSaved: (val) => tel = val,
+                  onSaved: (val) => tel = val.trim(),
                 ),
                 TextFormField(
                   decoration: InputDecoration(
                       prefixIcon: Icon(Icons.email), labelText: 'E-mail'),
                   validator: (value) => Locals.validateEmail(value),
-                  onSaved: (val) => email = val.toLowerCase(),
+                  onSaved: (val) => email = val.toLowerCase().trim(),
                 ),
                 TextFormField(
                   decoration: InputDecoration(
@@ -204,7 +205,7 @@ class _SignScreenState extends State<SignScreen> {
                           })),
                   validator: (value) => Locals.validatePassword(value),
                   obscureText: isObscureText,
-                  onSaved: (val) => password = val.toLowerCase(),
+                  onSaved: (val) => password = val.toLowerCase().trim(),
                 )
               ],
             ),
@@ -315,8 +316,6 @@ class _SignScreenState extends State<SignScreen> {
         _showErrorSnackbar("Ce numero est deja utilisé plusieur fois");
       } else {
         _signInWithPhoneNumber();
-        User user = new User(
-            username: username, passwords: password, tel: tel, email: email);
         Locals.user = user;
 
         MyNavigator.gotTo(context, '/validation');
@@ -376,6 +375,11 @@ class _SignScreenState extends State<SignScreen> {
       this.verificationId = verificationId;
       print(Locals.verifyID);
       setState(() {
+        Locals.verifyID = verificationId;
+        user = new User(
+            username: username, passwords: password, tel: tel, email: email);
+        Locals.number = tel;
+        Locals.user = user;
         _isSent = true;
       });
     };

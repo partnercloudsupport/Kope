@@ -160,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         prefixIcon: Icon(Icons.perm_identity),
                         labelText: 'Username'),
 //                validator:(val)=> Locals.validUsername(val),
-                    onSaved: (val) => username = val.toLowerCase(),
+                    onSaved: (val) => username = val.toLowerCase().trim(),
                   ),
                   TextFormField(
                     decoration: InputDecoration(
@@ -176,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             })),
                     obscureText: isObscureText,
                     validator: (value) => Locals.validatePassword(value),
-                    onSaved: (val) => password = val.toLowerCase(),
+                    onSaved: (val) => password = val.toLowerCase().trim(),
                   )
                 ],
               ),

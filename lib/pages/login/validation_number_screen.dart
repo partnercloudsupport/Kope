@@ -8,7 +8,6 @@ import 'dart:async';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class ValidationPhoneNumber extends StatefulWidget {
   @override
   _ValidationPhoneNumber createState() => _ValidationPhoneNumber();
@@ -20,7 +19,7 @@ class _ValidationPhoneNumber extends State<ValidationPhoneNumber> {
   FirebaseAuth _auth = FirebaseAuth.instance;
   String verificationId;
   String _sms;
-  bool _codeVerified = false;
+  bool _codeVerified = false, _isLoad = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   SharedPreferences prefs;
@@ -33,6 +32,7 @@ class _ValidationPhoneNumber extends State<ValidationPhoneNumber> {
     init();
 //    Timer(Duration(seconds: 10), );
   }
+
   void init() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -49,7 +49,7 @@ class _ValidationPhoneNumber extends State<ValidationPhoneNumber> {
       ),
       body: Form(
         key: _formKey,
-        child:  ListView(
+        child: ListView(
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(left: 50.0, right: 50.0),
@@ -60,20 +60,23 @@ class _ValidationPhoneNumber extends State<ValidationPhoneNumber> {
                   ),
                   Text(
                       'Entrez le code de validation envoyé \n   Au numero ${Locals.number} '
-                          '     \n          Par SMS pour confirmer \n'
-                          '                 votre inscription',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      '     \n          Par SMS pour confirmer \n'
+                      '                 votre inscription',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   SizedBox(
                     height: 40.0,
                   ),
-                  SizedBox(width: 150.0,
+                  SizedBox(
+                    width: 150.0,
                     child: TextFormField(
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.dialpad), hintText: 'Code',
+                        prefixIcon: Icon(Icons.dialpad),
+                        hintText: 'Code',
                       ),
-                      validator:validateSms,
-                      onSaved: (val)=>this._sms = val,
+                      validator: validateSms,
+                      onSaved: (val) => this._sms = val.trim(),
                     ),
                   ),
                   SizedBox(
@@ -87,8 +90,8 @@ class _ValidationPhoneNumber extends State<ValidationPhoneNumber> {
                     onPressed: () {
                       if (_formKey.currentState.validate()) {
                         _formKey.currentState.save();
-                        _submitSmsCode().then((value){
-                          if(value){
+                        _submitSmsCode().then((value) {
+                          if (value) {
                             prefs.setString('userId', userId);
                             MyNavigator.goReplaceAll(context, "/home");
                           }
@@ -119,7 +122,7 @@ class _ValidationPhoneNumber extends State<ValidationPhoneNumber> {
 
   Future<bool> inscription() async {
     _isComplete = false;
-
+    print("User saved data : ${Locals.username}");
     DocumentReference docRef;
     docRef = await collection.add({
       'username': Locals.user.username,
@@ -131,50 +134,60 @@ class _ValidationPhoneNumber extends State<ValidationPhoneNumber> {
       userId = docRef.documentID;
       _isComplete = true;
     }
-
     return _isComplete;
   }
 
   Future<bool> _submitSmsCode() async {
-    _codeVerified = false;
-    _isLogIn =true;
-    await _auth.currentUser().then((FirebaseUser user){
-      if(user == null){
-        _isLogIn = false;
-      }
-      else
-        print("user id:"+user.uid);
-      _codeVerified  =true;
+    setState(() {
+      _isLoad = false;
     });
-    if(!_isLogIn){
+    _codeVerified = false;
+    _isLogIn = true;
+    await _auth.currentUser().then((FirebaseUser user) {
+      if (user == null) {
+        _isLogIn = false;
+      } else
+        print("user id:" + user.uid);
+      _codeVerified = true;
+    });
+    if (!_isLogIn) {
       print('Auth process : Searching for cheking');
       print('Auth Message : $verificationId');
       final AuthCredential credential = PhoneAuthProvider.getCredential(
-          verificationId : verificationId,
-          smsCode: _sms
-      );
+          verificationId: verificationId, smsCode: _sms);
       print('Auth process : auth pass ${credential.toString()}');
-      FirebaseUser user = await _auth.signInWithCredential(credential).catchError((error){
-        if(error){
+      FirebaseUser user =
+          await _auth.signInWithCredential(credential).catchError((error) {
+        if (error) {
           print(error);
+          setState(() {
+            _isLoad = false;
+          });
           _codeVerified = false;
-          _showErrorSnackbar("Probleme lors de la verification, reessayer plus tard");
+          _showErrorSnackbar(
+              "Probleme lors de la verification, reessayer plus tard");
         }
       });
-      print("user id :"+user.uid);
+      print("user id :" + user.uid);
     }
-    if(_codeVerified){
-      inscription().then((value){
-        if(value)
-          _codeVerified = true;
-      }).catchError((error){
-        if(error){
+    if (_codeVerified) {
+      inscription().then((value) {
+        if (value) _codeVerified = true;
+      }).catchError((error) {
+        if (error) {
+          setState(() {
+            _isLoad = false;
+          });
           _codeVerified = false;
           print(error);
-          _showErrorSnackbar("Probleme lors de la verification, reessayer plus tard");
+          _showErrorSnackbar(
+              "Probleme lors de la verification, reessayer plus tard");
         }
       });
     }
+    setState(() {
+      _isLoad = false;
+    });
     return _codeVerified;
   }
 
@@ -183,5 +196,4 @@ class _ValidationPhoneNumber extends State<ValidationPhoneNumber> {
       SnackBar(content: Text(message)),
     );
   }
-
 }

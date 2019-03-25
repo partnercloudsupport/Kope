@@ -8,6 +8,7 @@ import 'package:kope/cloud/locals/locals.dart';
 import 'package:kope/cloud/models/user.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:kope/pages/widgets/animation/loading.dart';
 import 'package:kope/pages/widgets/custom_drop_down_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,8 +19,8 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   File _image;
-  String _img = null;
-  bool _isComplete;
+  String _img;
+  bool _isComplete, _isLoad = true;
   User _user;
   String uid;
   List<String> countries, cities, provinces;
@@ -40,7 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       profession,
       pays,
       imagePath,
-      cCode = "+243";
+      cCode = "+243", selectedProv;
   List<String> _provinceList = new List();
   SharedPreferences prefs;
   StorageUploadTask _task = null;
@@ -133,7 +134,92 @@ class _ProfileScreenState extends State<ProfileScreen> {
               })
         ],
       ),
-      body: ListView(children: <Widget>[
+      body: _buildScreen(),
+    );
+  }
+
+  Future<bool> _updateProfil() async {
+    _isComplete = true;
+    tel = cCode + tel.trim();
+    // province = provinceKey.elementAt(provinceKey.indexOf(province));
+    print("user current id $uid");
+    _isComplete = false;
+    print("user current province $province");
+    selectedProv = provinceKey.elementAt(_provinceList.indexOf(province));
+    final DocumentReference docRef = await firestore.document("user/$uid");
+    print(docRef.path);
+    print("file Url : ${imagePath}");
+    firestore.runTransaction((Transaction tx) async {
+      DocumentSnapshot postSnapshot = await tx.get(docRef);
+      print("dound user id :${postSnapshot.documentID}");
+      if (postSnapshot.exists) {
+        print("User found run update");
+        await tx.update(docRef, <String, dynamic>{
+          "email": email.trim(),
+          "tel": tel.trim(),
+          "nom": nom.trim(),
+          "profession": profession.trim(),
+          "province": selectedProv.trim(),
+          "ville": ville.trim(),
+          "imagePath": imagePath
+        }).catchError((er) {
+          setState(() {
+            _isLoad = false;
+          });
+          _isComplete = false;
+          _showErrorSnackbar("Une erreur est survenue, veiller reassayer!");
+        });
+      }
+    });
+    setState(() {
+      _isLoad = false;
+    });
+    return _isComplete;
+  }
+
+  _showErrorSnackbar(String message) {
+    _scaffoldKey.currentState.showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  _updateImage() async {
+    setState(() {
+      _isLoad = true;
+    });
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final FirebaseUser user = await auth.signInAnonymously();
+    print(uid);
+    ref = FirebaseStorage.instance.ref().child("profiles/" + uid + "-av.jpg");
+    print("Image Reference ${ref.path}");
+    _task = ref.putFile(_image);
+    _task.onComplete.then((task) {
+      print("upload tak is correct");
+      task.ref.getDownloadURL().then((url) {
+        imagePath = url.toString();
+        _updateProfil();
+      }).catchError((e) {
+        print(e);
+        _showErrorSnackbar("Une erreur est survenu, essayer");
+        setState(() {
+          _isLoad = false;
+        });
+      });
+    }).catchError((e) {
+      setState(() {
+        _isLoad = false;
+      });
+      print(e);
+      _showErrorSnackbar("Une erreur est survenu, essayer");
+    });
+  }
+
+  Widget _buildScreen() {
+    Widget widget;
+    if (_isLoad) {
+      widget = Center(child: MyLoading());
+    } else {
+      widget = ListView(children: <Widget>[
         Stack(
           children: <Widget>[
             Container(
@@ -145,18 +231,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _image,
                       fit: BoxFit.cover,
                     )
-                  : _img == null ?  Center(
-                      child: Icon(
-                        Icons.person,
-                        size: 200,
-                      ),
-                    )
-                    : Image(
-                      image: NetworkImage(
-                       _img,
-                    ),
-                    fit:  BoxFit.cover,
-                    ),
+                  : _img == null
+                      ? Center(
+                          child: Icon(
+                            Icons.person,
+                            size: 200,
+                          ),
+                        )
+                      : Image(
+                          image: NetworkImage(
+                            _img,
+                          ),
+                          fit: BoxFit.cover,
+                        ),
             ),
             Positioned(
               bottom: 20.0,
@@ -272,67 +359,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ))
-      ]),
-    );
-  }
-
-  Future<bool> _updateProfil() async {
-    _isComplete = true;
-    tel = cCode + tel.trim();
-    // province = provinceKey.elementAt(provinceKey.indexOf(province));
-    print("user current id $uid");
-    _isComplete = false;
-    province =provinceKey.elementAt(provinceKey.indexOf(province) - 1);
-    final DocumentReference docRef = await firestore.document("user/$uid");
-    print(docRef.path);
-    print("file Url : ${imagePath}");
-    firestore.runTransaction((Transaction tx) async {
-      DocumentSnapshot postSnapshot = await tx.get(docRef);
-      print("dound user id :${postSnapshot.documentID}");
-      if (postSnapshot.exists) {
-        print("User found run update");
-        await tx.update(docRef, <String, dynamic>{
-          "email": email.trim(),
-          "tel": tel.trim(),
-          "nom": nom.trim(),
-          "profession": profession.trim(),
-          "province": province.trim(),
-          "ville": ville.trim(),
-          "imagePath": imagePath
-        }).catchError((er) {
-          _isComplete = false;
-          _showErrorSnackbar("Une erreur est survenue, veiller reassayer!");
-        });
-      }
-    });
-    return _isComplete;
-  }
-
-  _showErrorSnackbar(String message) {
-    _scaffoldKey.currentState.showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
-  _updateImage() async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    final FirebaseUser user = await auth.signInAnonymously();
-    ref = FirebaseStorage.instance.ref().child("profiles/" + uid + "-av.jpg");
-    print("Image Reference ${ref.path}");
-    _task = ref.putFile(_image);
-    _task.onComplete.then((task) {
-      print("upload tak is correct");
-      task.ref.getDownloadURL().then((url){
-          imagePath = url.toString();
-          _updateProfil();
-      }).catchError((e){
-        print(e);
-      _showErrorSnackbar("Une erreur est survenu, essayer");
-      });
-    }).catchError((e) {
-      print(e);
-      _showErrorSnackbar("Une erreur est survenu, essayer");
-    });
+      ]);
+    }
+    return widget;
   }
 
   Future _loadCountries() async {
@@ -370,6 +399,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
     _loadUserData();
   }
+
   Future _loadUserData() async {
     await firestore
         .collection('user')
@@ -377,13 +407,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         .get()
         .then((DocumentSnapshot query) {
       if (query.exists) {
-          username = query.data["username"];  
-          _img = query.data["imagePath"];
+        username = query.data["username"];
+        _img = query.data["imagePath"];
       }
     });
     setState(() {
       username = username;
       _img = _img;
+      _isLoad = false;
     });
   }
 }

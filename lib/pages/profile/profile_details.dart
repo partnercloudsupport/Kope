@@ -28,7 +28,7 @@ class _ProfileDetailsState extends State<ProfileDetails> {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       uid = (prefs.getString('userId'));
-      // _loadUserData();
+      _loadUserData();
     });
   }
 
@@ -75,10 +75,7 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                             color: Colors.grey,
                             size: 100.0,
                           )
-                        : Image(
-                            image: NetworkImage(_img),
-                            fit: BoxFit.cover,
-                          ),
+                        : CircleAvatar(backgroundImage: NetworkImage(_img)),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(20.0),
@@ -101,7 +98,10 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                   SizedBox(
                     height: 25.0,
                   ),
-                  Text(addresse == null ? "Adresse" : addresse),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(addresse == null ? "Adresse" : addresse),
+                  ),
                   SizedBox(
                     height: 25.0,
                   ),
@@ -175,7 +175,7 @@ class _ProfileDetailsState extends State<ProfileDetails> {
       profession = profession;
       nom = nom;
       addresse = addresse;
-      // if (addresse != null) _loadAddresse(addresse);
+      _loadAddresse(addresse);
       ville = ville;
       tel = tel;
       email = email;

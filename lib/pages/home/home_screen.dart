@@ -1,5 +1,5 @@
 import 'package:kope/pages/widgets/categorie_menu.dart';
-import 'package:kope/pages/widgets/profile_details.dart';
+import 'package:kope/pages/profile/profile_details.dart';
 import 'package:flutter/material.dart';
 import 'package:kope/utils/my_navigator.dart';
 

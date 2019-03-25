@@ -1,8 +1,14 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:kope/cloud/locals/locals.dart';
+import 'package:kope/pages/widgets/animation/loading.dart';
 import 'package:kope/pages/widgets/custom_drop_down_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddProduct extends StatefulWidget {
   @override
@@ -11,16 +17,27 @@ class AddProduct extends StatefulWidget {
 
 class _AddProductState extends State<AddProduct> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String categorie;
-  List<String> _categorieList = ["Electronique", "Vetement"];
+  String categorie, _desc, _designation, _prix;
+  List<String> _categorieList, _categorieKey;
   List<File> _image = List<File>();
   final PageController ctrl = PageController(viewportFraction: 0.8);
+  Firestore _db = Firestore.instance;
+  bool _isComplete, _isLoad = false;
+  int _limitP = 5;
+  StorageReference ref;
+  SharedPreferences prefs;
+  String uid;
+  List<dynamic> _pathImages;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  StorageUploadTask _task = null;
   // Keep track of current page to avoid unnecessary renders
   int currentPage = 0;
   @override
   void initState() {
     super.initState();
-    categorie = _categorieList[0];
+    init();
+    _categorieList = new List();
+    _categorieKey = new List();
     ctrl.addListener(() {
       int next = ctrl.page.round();
 
@@ -32,6 +49,14 @@ class _AddProductState extends State<AddProduct> {
     });
   }
 
+  void init() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      uid = (prefs.getString('userId'));
+    });
+    _loadCategorie();
+  }
+
   picker(bool isCamenra) async {
     print('Picker is called');
     File img = isCamenra
@@ -39,7 +64,10 @@ class _AddProductState extends State<AddProduct> {
         : await ImagePicker.pickImage(source: ImageSource.gallery);
     if (img != null) {
       _image.add(img);
-      setState(() {});
+
+      setState(() {
+        _limitP = _limitP - 1;
+      });
     }
   }
 
@@ -97,10 +125,31 @@ class _AddProductState extends State<AddProduct> {
         });
   }
 
+  _removeImage() {
+    if (_image.length != 0) {
+      _limitP = _limitP + 1;
+      setState(() {
+        _image.removeAt(currentPage);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
+      key: _scaffoldKey,
+      body: _buildScreen(),
+    );
+  }
+
+  Widget _buildScreen() {
+    Widget widget;
+    if (_isLoad) {
+      widget = Center(
+        child: MyLoading(),
+      );
+    } else {
+      widget = CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
             backgroundColor: Colors.grey,
@@ -138,17 +187,28 @@ class _AddProductState extends State<AddProduct> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          RaisedButton(
-                            child: Text('Add Photo'),
-                            onPressed: () {
-                              _showBottomSheet();
-                            },
-                          ),
+                          _limitP != 0
+                              ? RaisedButton(
+                                  child: Text('Add Photo'),
+                                  onPressed: () {
+                                    _showBottomSheet();
+                                  },
+                                )
+                              : SizedBox(
+                                  width: 1,
+                                ),
                           SizedBox(
                             width: 10.0,
                           ),
                           RaisedButton(
-                            child: Text('Remove Photo'),
+                            child: Text(
+                              'Remove Photo',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            color: Colors.grey,
+                            onPressed: () {
+                              _removeImage();
+                            },
                           )
                         ],
                       ),
@@ -192,14 +252,19 @@ class _AddProductState extends State<AddProduct> {
                                 validator: (value) => value == null
                                     ? 'Completez la designation'
                                     : null,
+                                onSaved: (val) =>
+                                    _designation = val.toLowerCase().trim(),
                               ),
                               TextFormField(
                                 decoration: InputDecoration(
                                   icon: Icon(Icons.monetization_on),
                                   labelText: 'Prix',
                                 ),
+                                keyboardType: TextInputType.number,
                                 validator: (value) =>
                                     value == null ? 'Completez le prix' : null,
+                                onSaved: (val) =>
+                                    _prix = val.toLowerCase().trim(),
                               ),
                               TextFormField(
                                 decoration: InputDecoration(
@@ -211,6 +276,8 @@ class _AddProductState extends State<AddProduct> {
                                 validator: (value) => value == null
                                     ? 'Completez la description'
                                     : null,
+                                onSaved: (val) =>
+                                    _desc = val.toLowerCase().trim(),
                               ),
                               Spacer(),
                               RaisedButton(
@@ -218,6 +285,8 @@ class _AddProductState extends State<AddProduct> {
                                   onPressed: () {
                                     if (_formKey.currentState.validate()) {
                                       _formKey.currentState.save();
+                                      _uploadTask();
+                                      // Locals.showSuccess(context);
                                     }
                                   })
                             ],
@@ -231,7 +300,90 @@ class _AddProductState extends State<AddProduct> {
             ),
           )
         ],
-      ),
-    );
+      );
+    }
+    return widget;
+  }
+
+  Future<bool> _saveData() async {
+    print("image number : ${_pathImages.length}");
+    await _db.collection("articles").add({
+      'uuid': uid,
+      'categories': _categorieKey.elementAt(_categorieList.indexOf(categorie)),
+      'desc': _desc,
+      'designation': _designation,
+      'prix': double.parse(_prix),
+      'images': _pathImages,
+      'create_at': DateTime.now()
+    }).catchError((e) {
+      setState(() {
+        _isLoad = false;
+      });
+      print(e);
+      Locals.showErrorSnackbar(
+          "Une erreur s'est produite reessayer", _scaffoldKey);
+    });
+    setState(() {
+      _isLoad = false;
+      _image = new List();
+    });
+    print("all is good");
+    Locals.showSuccess(context);
+    return _isComplete;
+  }
+
+  Future _loadCategorie() async {
+    await _db
+        .collection('categories')
+        .getDocuments()
+        .then((QuerySnapshot query) {
+      if (query.documents.isNotEmpty) {
+        for (DocumentSnapshot e in query.documents) {
+          _categorieList.add(e.data["name"]);
+          _categorieKey.add(e.documentID);
+        }
+      }
+    });
+    setState(() {
+      categorie = _categorieList[0];
+    });
+  }
+
+  _uploadTask() async {
+    setState(() {
+      _isLoad = true;
+    });
+    String _imagePath;
+    _pathImages = new List();
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final FirebaseUser user = await auth.signInAnonymously();
+
+    for (File _img in _image) {
+      int currentIndex = _image.indexOf(_img);
+      var dt = DateTime.now().millisecondsSinceEpoch.toString();
+      ref = FirebaseStorage.instance
+          .ref()
+          .child("uploads/" + "img-" + dt + uid + "-av.jpg");
+      print("Image Reference ${ref.path}");
+      _task = ref.putFile(_img);
+      _task.onComplete.then((task) {
+        print("upload tak is correct");
+        task.ref.getDownloadURL().then((url) {
+          _imagePath = url.toString();
+          _pathImages.add({'image${_pathImages.length + 1}': _imagePath});
+          if (_img == _image.last) _saveData();
+        }).catchError((e) {
+          print(e);
+          Locals.showErrorSnackbar(
+              "Une erreur est survenu, essayer", _scaffoldKey);
+          return;
+        });
+      }).catchError((e) {
+        print(e);
+        Locals.showErrorSnackbar(
+            "Une erreur est survenu, essayer", _scaffoldKey);
+        return;
+      });
+    }
   }
 }
