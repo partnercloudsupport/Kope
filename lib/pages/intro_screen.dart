@@ -27,7 +27,6 @@ class IntroScreenState extends State<IntroScreen> {
 
   void init() async {
     prefs = await SharedPreferences.getInstance();
-    prefs.commit();
     setState(() {
       isFirst = prefs.getBool('isFirst');
     });

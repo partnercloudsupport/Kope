@@ -1,6 +1,5 @@
 import 'package:kope/cloud/models/user.dart';
-import 'package:kope/utils/flutkart.dart';
-import 'package:flutter/material.dart';
+import 'package:photo_manager/photo_manager.dart';
 
 class Locals {
   static User user;
@@ -9,7 +8,7 @@ class Locals {
   static String uid;
   static String verifyID;
   static bool isAccept = false;
-
+  static List<AssetEntity> imgList;
   static String validUsername(String value) {
     Pattern pattern = r'^([a-zA-Z])$';
     RegExp regex = new RegExp(pattern);
@@ -55,20 +54,20 @@ class Locals {
       return null;
   }
 
-  static Widget loading() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          CircularProgressIndicator(
-            backgroundColor: Colors.blue,
-          ),
-          Text(
-            Flutkart.load,
-            style: TextStyle(fontSize: 10, color: Colors.black87),
-          )
-        ],
-      ),
-    );
-  }
+  // static Widget loading() {
+  //   return Center(
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: <Widget>[
+  //         CircularProgressIndicator(
+  //           backgroundColor: Colors.blue,
+  //         ),
+  //         Text(
+  //           Flutkart.load,
+  //           style: TextStyle(fontSize: 10, color: Colors.black87),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
 }

@@ -1,5 +1,6 @@
 import 'package:kope/cloud/locals/locals.dart';
 import 'package:kope/cloud/models/user.dart';
+import 'package:kope/pages/widgets/animation/loading.dart';
 import 'package:kope/pages/widgets/dialog.dart';
 import 'package:kope/utils/flutkart.dart';
 import 'package:kope/utils/my_navigator.dart';
@@ -179,7 +180,7 @@ class _SignScreenState extends State<SignScreen> {
                         cCode = countryCode.toString();
                       },
                     ),
-                      labelText: 'Numero Tel'),
+                      hintText: 'Numero Tel'),
                   validator: (value) => Locals.validateMobile(value),
                   onSaved: (val) => tel = val,
                 ),
@@ -273,7 +274,6 @@ class _SignScreenState extends State<SignScreen> {
   }
 
   void _userVerification() {
-    //TODO:doms: uncomment for check number
     //                    _checkNumber().then((isExist){
     //                      if(isExist){
     //                        setState(() {
@@ -350,7 +350,7 @@ class _SignScreenState extends State<SignScreen> {
         ],
       );
     } else
-      return Locals.loading();
+      return Center(child: MyLoading());
   }
 
   Future<void> _signInWithPhoneNumber() async {

@@ -42,7 +42,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     countriesKey = new List();
     countries = new List();

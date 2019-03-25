@@ -1,4 +1,5 @@
 import 'package:kope/cloud/locals/locals.dart';
+import 'package:kope/pages/widgets/animation/loading.dart';
 import 'package:kope/utils/flutkart.dart';
 import 'package:kope/utils/my_navigator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -187,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget buildScreen() {
     Widget widget;
     if (_isLoad) {
-      widget = Locals.loading();
+      widget = MyLoading();
     } else {
       widget = ListView(
         children: <Widget>[
@@ -225,7 +226,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
       );
     }
-    return widget;
+    return Container(child: Center(child: widget));
   }
 
   SizedBox buildLoginButton(BuildContext context) {

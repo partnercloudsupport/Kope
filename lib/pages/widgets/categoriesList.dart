@@ -33,7 +33,7 @@ List list = [
   },
   {
     "id": "petittravaux",
-    "name": "Petit Travaux",
+    "name": "Petits Travaux",
     "icon": Icons.shopping_cart,
     "color": Colors.orange
   },
@@ -50,16 +50,16 @@ List list = [
     "color": Colors.purple
   },
   {
+    "id": "camion",
+    "name": "Véhicules",
+    "icon": Icons.directions_transit,
+    "color": Colors.amber
+  },
+  {
     "id": "hopital",
     "name": "Hopital",
     "icon": Icons.local_hospital,
     "color": Colors.red
-  },
-  {
-    "id": "camion",
-    "name": "Véhicules Commerciaux",
-    "icon": Icons.directions_transit,
-    "color": Colors.amber
   },
   {
     "id": "divers",

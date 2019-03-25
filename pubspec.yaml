@@ -28,8 +28,10 @@ dependencies:
   firebase_auth: ^0.8.1+4
   firebase_storage:
   image_picker:
+  photo:
   country_code_picker:
-
+  #multi_image_picker:
+    
 dev_dependencies:
   flutter_test:
     sdk: flutter
