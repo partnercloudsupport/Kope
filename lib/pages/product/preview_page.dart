@@ -13,7 +13,7 @@ class PreviewPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Image Selectionée"),
-        actions: <Widget>[FlatButton(child: Text('Valider', style: TextStyle(color: Colors.white),),)],
+        actions: <Widget>[FlatButton(child: Text('Valider', style: TextStyle(color: Colors.white),), onPressed: () {},)],
       ),
       body: ListView(
         children: list

@@ -148,6 +148,7 @@ class _AddProductState extends State<AddProduct> {
                             width: 10.0,
                           ),
                           RaisedButton(
+                            onPressed: (){},
                             child: Text('Remove Photo'),
                           )
                         ],

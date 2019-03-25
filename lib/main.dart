@@ -7,6 +7,7 @@ import 'package:kope/pages/product/add_product.dart';
 import 'package:kope/pages/profile/profile_screen.dart';
 import 'package:kope/pages/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:kope/pages/stockage/storage_screen.dart';
 import 'package:kope/pages/widgets/profile_details.dart';
 
 var routes = <String, WidgetBuilder>{
@@ -18,6 +19,7 @@ var routes = <String, WidgetBuilder>{
   "/profile": (BuildContext context) => ProfileScreen(),
   "/profileDetlais": (BuildContext context) => ProfileDetails(),
   "/product": (BuildContext context) => AddProduct(),
+  "/storage": (BuildContext context) => StorageScreen(),
 };
 void main() => runApp(MyApp());
 

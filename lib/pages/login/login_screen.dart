@@ -15,7 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _value = false, _isLoad = false;
   bool _hasdata;
   SharedPreferences prefs;
-  String userId = null;
+  String userId = "";
   bool isObscureText = true;
   String username, password;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
