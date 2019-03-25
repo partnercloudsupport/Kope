@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:kope/cloud/models/user.dart';
 import 'package:photo_manager/photo_manager.dart';
 
@@ -21,11 +22,17 @@ class Locals {
   }
 
   static String validName(String value) {
-    if(value == null){
+    if (value == null) {
       return 'Completez le nom';
-    } else{
+    } else {
       return null;
     }
+  }
+
+  static showErrorSnackbar(String message, GlobalKey<ScaffoldState> key) {
+    key.currentState.showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   static String validateMobile(String value) {

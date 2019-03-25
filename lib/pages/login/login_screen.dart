@@ -314,6 +314,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _hasdata = true;
         Locals.uid = query.documents[0].documentID;
         Locals.username = query.documents[0].data['username'];
+        print("user is : ${Locals.uid}");
       }
     });
     return _hasdata;

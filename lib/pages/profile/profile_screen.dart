@@ -1,13 +1,15 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:kope/cloud/locals/locals.dart';
 import 'package:kope/cloud/models/user.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kope/pages/widgets/custom_drop_down_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -16,6 +18,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   File _image;
+  String _img = null;
   bool _isComplete;
   User _user;
   String uid;
@@ -23,7 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   List<String> countriesKey, citiesKey, provinceKey;
   int selectedC, selectedCo, selectedPro;
   StorageReference ref;
-  var collection = Firestore.instance.collection("user");
+  Firestore firestore;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String username,
@@ -38,18 +41,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
       pays,
       imagePath,
       cCode = "+243";
-  List<String> _provinceList = ["Kinshasa", "Nord-Kivu"];
+  List<String> _provinceList = new List();
+  SharedPreferences prefs;
+  StorageUploadTask _task = null;
 
   @override
   void initState() {
     super.initState();
+    init();
     countriesKey = new List();
     countries = new List();
     cities = new List();
     citiesKey = new List();
     provinceKey = new List();
-    province = _provinceList[0];
-    _loadCountries();
+    _loadProvince();
+  }
+
+  void init() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      uid = (prefs.getString('userId'));
+    });
   }
 
   picker(bool isCamenra) async {
@@ -115,7 +127,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 if (_image != null) {
                   if (_formKey.currentState.validate()) {
                     _formKey.currentState.save();
-                    //update here
+                    _updateImage();
                   }
                 }
               })
@@ -133,11 +145,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _image,
                       fit: BoxFit.cover,
                     )
-                  : Center(
+                  : _img == null ?  Center(
                       child: Icon(
                         Icons.person,
                         size: 200,
                       ),
+                    )
+                    : Image(
+                      image: NetworkImage(
+                       _img,
+                    ),
+                    fit:  BoxFit.cover,
                     ),
             ),
             Positioned(
@@ -160,7 +178,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Row(
             children: <Widget>[
               Text(
-                'My Username',
+                username == null ? 'My Username' : username,
                 style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
               ),
             ],
@@ -178,8 +196,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       icon: Icon(Icons.person),
                       labelText: 'Nom Complet',
                     ),
-                    validator:(value)=> Locals.validName(value),
-                    onSaved: (val) => username = val.toLowerCase(),
+                    validator: (value) => Locals.validName(value),
+                    onSaved: (val) => nom = val.toLowerCase(),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 10.0),
@@ -258,34 +276,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Future<bool> _UpdateProfil() async {
+  Future<bool> _updateProfil() async {
     _isComplete = true;
-    ville = citiesKey.elementAt(selectedC);
-    pays = countriesKey.elementAt(selectedCo);
-    province = provinceKey.elementAt(selectedPro);
-    final DocumentReference docRef = Firestore.instance.document('user/$uid');
-    Firestore.instance.runTransaction((Transaction tx) async {
+    tel = cCode + tel.trim();
+    // province = provinceKey.elementAt(provinceKey.indexOf(province));
+    print("user current id $uid");
+    _isComplete = false;
+    province =provinceKey.elementAt(provinceKey.indexOf(province) - 1);
+    final DocumentReference docRef = await firestore.document("user/$uid");
+    print(docRef.path);
+    print("file Url : ${imagePath}");
+    firestore.runTransaction((Transaction tx) async {
       DocumentSnapshot postSnapshot = await tx.get(docRef);
+      print("dound user id :${postSnapshot.documentID}");
       if (postSnapshot.exists) {
+        print("User found run update");
         await tx.update(docRef, <String, dynamic>{
-          username: username,
-          passwords: passwords,
-          email: email,
-          tel: tel,
-          adresse: adresse,
-          nom: nom,
-          profession: profession,
-          province: province,
-          ville: ville,
-          pays: pays,
-          imagePath: ref.toString(),
+          "email": email.trim(),
+          "tel": tel.trim(),
+          "nom": nom.trim(),
+          "profession": profession.trim(),
+          "province": province.trim(),
+          "ville": ville.trim(),
+          "imagePath": imagePath
         }).catchError((er) {
           _isComplete = false;
           _showErrorSnackbar("Une erreur est survenue, veiller reassayer!");
         });
       }
     });
-
     return _isComplete;
   }
 
@@ -295,9 +314,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Future _updateImage() async {
-    ref = FirebaseStorage.instance.ref().child(uid + "-av.jpg");
-    final StorageUploadTask task = await ref.putFile(_image);
+  _updateImage() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final FirebaseUser user = await auth.signInAnonymously();
+    ref = FirebaseStorage.instance.ref().child("profiles/" + uid + "-av.jpg");
+    print("Image Reference ${ref.path}");
+    _task = ref.putFile(_image);
+    _task.onComplete.then((task) {
+      print("upload tak is correct");
+      task.ref.getDownloadURL().then((url){
+          imagePath = url.toString();
+          _updateProfil();
+      }).catchError((e){
+        print(e);
+      _showErrorSnackbar("Une erreur est survenu, essayer");
+      });
+    }).catchError((e) {
+      print(e);
+      _showErrorSnackbar("Une erreur est survenu, essayer");
+    });
   }
 
   Future _loadCountries() async {
@@ -314,10 +349,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  Future _loadProvince(String countriesKey) async {
-    await Firestore.instance
+  Future _loadProvince() async {
+    firestore = Firestore.instance;
+    await firestore
         .collection('province')
-        .where("pays", isEqualTo: countriesKey)
         .getDocuments()
         .then((QuerySnapshot query) {
       if (query.documents.isNotEmpty) {
@@ -327,20 +362,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
       }
     });
+    setState(() {
+      firestore = firestore;
+      province = cities[0];
+      _provinceList = cities;
+      provinceKey = citiesKey;
+    });
+    _loadUserData();
   }
-
-  Future _loadCities(String provinceKey) async {
-    await Firestore.instance
-        .collection('ville')
-        .where("province", isEqualTo: provinceKey)
-        .getDocuments()
-        .then((QuerySnapshot query) {
-      if (query.documents.isNotEmpty) {
-        for (DocumentSnapshot e in query.documents) {
-          cities.add(e.data["name"]);
-          citiesKey.add(e.documentID);
-        }
+  Future _loadUserData() async {
+    await firestore
+        .collection('user')
+        .document(uid)
+        .get()
+        .then((DocumentSnapshot query) {
+      if (query.exists) {
+          username = query.data["username"];  
+          _img = query.data["imagePath"];
       }
+    });
+    setState(() {
+      username = username;
+      _img = _img;
     });
   }
 }
