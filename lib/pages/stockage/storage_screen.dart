@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:kope/cloud/models/article.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageScreen extends StatefulWidget {
   @override
@@ -7,6 +9,24 @@ class StorageScreen extends StatefulWidget {
 }
 
 class _StorageScreenState extends State<StorageScreen> {
+  SharedPreferences prefs;
+  String uid, _categorie;
+  Firestore _db = Firestore.instance;
+  List<DocumentSnapshot> _doc = new List();
+@override
+  void initState() {
+    super.initState();
+    init();
+  }
+
+  void init() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      uid = (prefs.getString('userId'));
+    });
+    _loadUSerData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,44 +35,53 @@ class _StorageScreenState extends State<StorageScreen> {
         title: Text("Mes Stockages"),
       ),
       body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: 100.0,
-              color: Colors.blue,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-                child: Column(
-                  children: <Widget>[
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    _buildSearchBar(),
-                  ],
+          scrollDirection: Axis.vertical,
+          child: Column(
+            children: <Widget>[
+              Container(
+                height: 100.0,
+                color: Colors.blue,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                  child: Column(
+                    children: <Widget>[
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      _buildSearchBar(),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SizedBox(
-              height: 5.0,
-            ),
-            ListView.builder(
-                shrinkWrap: true,
-                itemCount: 10,
-                physics: ClampingScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                itemBuilder: (context, index) {
-                  Article art =Article();
-                  art.categorie = "categorie";
-                  art.designation = "Article";
-                  art.prix = 12000.0;
-                  return articleCard(article: art);
-                }),
-            
-          ],
-        )
-      ),
+              SizedBox(
+                height: 5.0,
+              ),
+              ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _doc.length,
+                  physics: ClampingScrollPhysics(),
+                  scrollDirection: Axis.vertical,
+                  itemBuilder: (context, index) {
+                    Article art = Article();
+                    art.id = _doc[index].documentID;
+                    _loadCateorie(_doc[index].data["categories"].toString());
+                    art.categorie = _categorie;
+                    art.designation = _doc[index].data["designation"];
+                    art.prix = _doc[index].data["prix"];
+                    art.likes = _doc[index].data["likes"];
+                    List<dynamic> list = new List.from(_doc[index].data["images"]);
+                    art.img =  list[0]["image1"];
+                    // print("Les valeurs ${list[0]["image1"]}");
+                    return articleCard(article: art);
+                  }),
+            ],
+          )),
     );
+  }
+
+  @override
+  void dispose(){
+    super.dispose();
   }
 
   Widget _buildSearchBar() {
@@ -85,12 +114,42 @@ class _StorageScreenState extends State<StorageScreen> {
       ),
     );
   }
+   Future _loadUSerData() async {
+    await _db
+        .collection('articles')
+        .where("uuid", isEqualTo: uid)
+        .orderBy("create_at",descending: true)
+        .limit(30)
+        .getDocuments()
+        .then((QuerySnapshot query) {
+      if (query.documents.isNotEmpty) {
+        _doc = query.documents;
+      }
+    });
+    setState(() {
+      
+    });
+  }
+  Future _loadCateorie(String key) async {
+    await _db
+        .collection('categories')
+        .document(key)
+        .get()
+        .then((DocumentSnapshot doc) {
+      if (doc.exists) {
+        _categorie = doc["name"];
+      }
+    });
+    setState(() {
+      
+    });
+  }
 }
 
 class articleCard extends StatelessWidget {
   final Article article;
 
-  const articleCard({ this.article});
+  const articleCard({this.article});
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -111,9 +170,9 @@ class articleCard extends StatelessWidget {
                   child: Container(
                     height: 100.0,
                     width: 100.0,
-                    child: Icon(
-                      Icons.image,
-                      size: 100.0,
+                    child: Image(
+                      image: NetworkImage(article.img),
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
@@ -138,10 +197,12 @@ class articleCard extends StatelessWidget {
                       spacing: 8.0,
                       runSpacing: -8.0,
                       children: <Widget>[
-                        FlightDetailChip(Icons.category, '${article.categorie}'),
+                        FlightDetailChip(
+                            Icons.category, '${article.categorie}'),
                       ],
                     ),
-                    FlightDetailChip(Icons.monetization_on, '${article.prix}')
+                    FlightDetailChip(Icons.monetization_on, '${article.prix}'),
+                    FlightDetailChip(Icons.favorite, '${article.likes}')
                   ],
                 )
               ],
@@ -149,7 +210,9 @@ class articleCard extends StatelessWidget {
       ),
     );
   }
+   
 }
+
 
 class FlightDetailChip extends StatelessWidget {
   final IconData iconData;
@@ -174,4 +237,6 @@ class FlightDetailChip extends StatelessWidget {
       ),
     );
   }
+
+
 }

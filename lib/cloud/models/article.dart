@@ -1,6 +1,6 @@
 class Article {
-  String designation,description,categorie;
-  double prix;
+  String id, designation, description, categorie, img;
+  double prix, likes;
   DateTime date;
 
 }

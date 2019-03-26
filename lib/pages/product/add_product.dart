@@ -49,6 +49,11 @@ class _AddProductState extends State<AddProduct> {
     });
   }
 
+  @override
+  void dispose(){
+    super.dispose();
+  }
+
   void init() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -83,7 +88,7 @@ class _AddProductState extends State<AddProduct> {
       curve: Curves.easeOutQuint,
       margin: EdgeInsets.only(top: top, bottom: 1, right: 3),
       child: Image.file(img,
-          fit: BoxFit.cover, width: MediaQuery.of(context).size.width),
+          fit: BoxFit.contain, width: MediaQuery.of(context).size.width),
     );
   }
 
@@ -162,7 +167,7 @@ class _AddProductState extends State<AddProduct> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 background: _image.length == 0
-                    ? Image.asset("assets/images/back.jpg", fit: BoxFit.cover)
+                    ? Image.asset("assets/images/back.jpg", fit: BoxFit.contain)
                     : PageView.builder(
                         controller: ctrl,
                         itemCount: _image.length,
@@ -314,7 +319,8 @@ class _AddProductState extends State<AddProduct> {
       'designation': _designation,
       'prix': double.parse(_prix),
       'images': _pathImages,
-      'create_at': DateTime.now()
+      'create_at': DateTime.now(),
+      'likes' : 0.0
     }).catchError((e) {
       setState(() {
         _isLoad = false;
@@ -335,6 +341,7 @@ class _AddProductState extends State<AddProduct> {
   Future _loadCategorie() async {
     await _db
         .collection('categories')
+        .orderBy("name", descending: false)
         .getDocuments()
         .then((QuerySnapshot query) {
       if (query.documents.isNotEmpty) {

@@ -1,10 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kope/pages/widgets/categorie_menu.dart';
-<<<<<<< HEAD
 import 'package:kope/pages/profile/profile_details.dart';
-=======
->>>>>>> d6cbada00ed8772f42b0bf6fafc946a248621325
 import 'package:flutter/material.dart';
 import 'package:kope/utils/my_navigator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -14,6 +13,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   TabController _controller;
+  SharedPreferences prefs;
+  String uid, _username, _email, _img;
+  Firestore _db = Firestore.instance;
   int _index = 0;
 
   @override
@@ -21,6 +23,15 @@ class _HomeScreenState extends State<HomeScreen>
     super.initState();
     _controller = new TabController(vsync: this, length: 5);
     _controller.addListener(_handleTabSelection);
+    init();
+  }
+
+  void init() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      uid = (prefs.getString('userId'));
+    });
+    _loadUSerData();
   }
 
   @override
@@ -43,47 +54,58 @@ class _HomeScreenState extends State<HomeScreen>
           centerTitle: true,
         ),
         drawer: new Drawer(
-      elevation: 10.0,
-      child: Column(
-        children: <Widget>[
-          UserAccountsDrawerHeader(
-            currentAccountPicture: CircleAvatar(
-              child: Text('N'),
-            ),
-            accountName: Text('Username'),
-            accountEmail: Text('Email'),
+          elevation: 10.0,
+          child: Column(
+            children: <Widget>[
+              UserAccountsDrawerHeader(
+                currentAccountPicture: _img == null
+                    ? CircleAvatar(child: Text('N'))
+                    : Material(
+                        elevation: 10.0,
+                        borderRadius: BorderRadius.circular(50.0),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                              image: DecorationImage(
+                            image: NetworkImage(_img),
+                            fit: BoxFit.cover,
+                          )),
+                        ),
+                      ),
+                accountName: Text(_username == null ? 'Username' : _username),
+                accountEmail: Text(_email == null ? 'Email' : _email),
+              ),
+              new ListTile(
+                leading: Icon(Icons.person),
+                title: Text('Profile'),
+                onTap: () {
+                  MyNavigator.gotTo(context, "/profileDetlais");
+                },
+              ),
+              new ListTile(
+                leading: Icon(Icons.shopping_basket),
+                title: Text('Ajouter Produit'),
+                onTap: () {
+                  MyNavigator.gotTo(context, "/product");
+                },
+              ),
+              new ListTile(
+                leading: Icon(Icons.storage),
+                title: Text('Mes Stockages'),
+                onTap: () {
+                  MyNavigator.gotTo(context, "/storage");
+                },
+              ),
+              Spacer(),
+              Divider(),
+              new ListTile(
+                leading: Icon(Icons.lock_open),
+                title: Text('Déconnection'),
+                onTap: () {},
+              ),
+            ],
           ),
-          new ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Profile'),
-            onTap: () {
-              MyNavigator.gotTo(context, "/profileDetlais");
-            },
-          ),
-          new ListTile(
-            leading: Icon(Icons.shopping_basket),
-            title: Text('Ajouter Produit'),
-            onTap: () {
-              MyNavigator.gotTo(context, "/product");
-            },
-          ),
-          new ListTile(
-            leading: Icon(Icons.storage),
-            title: Text('Mes Stockages'),
-            onTap: () {
-              MyNavigator.gotTo(context, "/storage");
-            },
-          ),
-          Spacer(),
-          Divider(),
-          new ListTile(
-            leading: Icon(Icons.lock_open),
-            title: Text('Déconnection'),
-            onTap: () {},
-          ),
-        ],
-      ),
-    ),
+        ),
         bottomNavigationBar: BottomNavigationBar(
           onTap: (int index) {
             setState(() {
@@ -155,5 +177,20 @@ class _HomeScreenState extends State<HomeScreen>
           ),
           new CategorieMenu(),
         ]));
+  }
+
+  Future _loadUSerData() async {
+    await _db
+        .collection('user')
+        .document(uid)
+        .get()
+        .then((DocumentSnapshot doc) {
+      if (doc.exists) {
+        _username = doc["username"];
+        _email = doc["email"];
+        _img = doc["imagePath"];
+      }
+    });
+    setState(() {});
   }
 }
