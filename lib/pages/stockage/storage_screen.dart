@@ -64,7 +64,6 @@ class _StorageScreenState extends State<StorageScreen> {
                   itemBuilder: (context, index) {
                     Article art = Article();
                     art.id = _doc[index].documentID;
-                    _loadCateorie(_doc[index].data["categories"].toString());
                     art.categorie = _categorie;
                     art.designation = _doc[index].data["designation"];
                     art.prix = _doc[index].data["prix"];
@@ -114,7 +113,7 @@ class _StorageScreenState extends State<StorageScreen> {
       ),
     );
   }
-   Future _loadUSerData() async {
+  Future _loadUSerData() async {
     await _db
         .collection('articles')
         .where("uuid", isEqualTo: uid)
@@ -124,27 +123,24 @@ class _StorageScreenState extends State<StorageScreen> {
         .then((QuerySnapshot query) {
       if (query.documents.isNotEmpty) {
         _doc = query.documents;
-      }
-    });
+      }});
     setState(() {
-      
-    });
-  }
-  Future _loadCateorie(String key) async {
-    await _db
-        .collection('categories')
-        .document(key)
-        .get()
-        .then((DocumentSnapshot doc) {
-      if (doc.exists) {
-        _categorie = doc["name"];
-      }
-    });
-    setState(() {
-      
     });
   }
 }
+//   Future<String> _loadCateorie(String key) async {
+//     await _db
+//         .collection('categories')
+//         .document(key)
+//         .get()
+//         .then((DocumentSnapshot doc) {
+//       if (doc.exists) {
+//         _categorie = doc["name"];
+//       }
+//     });
+//     return _categorie;
+//   }
+// }
 
 class articleCard extends StatelessWidget {
   final Article article;
@@ -193,14 +189,6 @@ class articleCard extends StatelessWidget {
                         )
                       ],
                     ),
-                    Wrap(
-                      spacing: 8.0,
-                      runSpacing: -8.0,
-                      children: <Widget>[
-                        FlightDetailChip(
-                            Icons.category, '${article.categorie}'),
-                      ],
-                    ),
                     FlightDetailChip(Icons.monetization_on, '${article.prix}'),
                     FlightDetailChip(Icons.favorite, '${article.likes}')
                   ],
@@ -237,6 +225,4 @@ class FlightDetailChip extends StatelessWidget {
       ),
     );
   }
-
-
 }

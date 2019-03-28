@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kope/pages/home/item_page.dart';
 import 'package:kope/pages/widgets/categorie_menu.dart';
 import 'package:kope/pages/profile/profile_details.dart';
 import 'package:flutter/material.dart';
@@ -49,9 +50,16 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: new AppBar(
-          title: new Text("KopInc"),
+        appBar: AppBar(
+          title: Text('Kope', style: TextStyle(color: Colors.white)),
           centerTitle: true,
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.search, color: Colors.white),
+              onPressed: () {},
+              color: Colors.grey,
+            ),
+          ],
         ),
         drawer: new Drawer(
           elevation: 10.0,
@@ -96,6 +104,13 @@ class _HomeScreenState extends State<HomeScreen>
                   MyNavigator.gotTo(context, "/storage");
                 },
               ),
+              // new ListTile(
+              //   leading: Icon(Icons.home),
+              //   title: Text('Home'),
+              //   onTap: () {
+              //     MyNavigator.gotTo(context, "/items");
+              //   },
+              // ),
               Spacer(),
               Divider(),
               new ListTile(
@@ -169,9 +184,7 @@ class _HomeScreenState extends State<HomeScreen>
           new Container(
             child: new Center(child: Text('2')),
           ),
-          new Container(
-            child: new Center(child: Text('3')),
-          ),
+          new ItemDetails(),
           new Container(
             child: new Center(child: Text('...')),
           ),
@@ -191,6 +204,10 @@ class _HomeScreenState extends State<HomeScreen>
         _img = doc["imagePath"];
       }
     });
-    setState(() {});
+    setState(() {
+      _username = _username;
+      _email = _email;
+      _img = _img;
+    });
   }
 }

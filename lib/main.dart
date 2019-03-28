@@ -1,4 +1,5 @@
 import 'package:kope/pages/home/home_screen.dart';
+import 'package:kope/pages/home/item_page.dart';
 import 'package:kope/pages/intro_screen.dart';
 import 'package:kope/pages/login/login_screen.dart';
 import 'package:kope/pages/login/signUp_screen.dart';
@@ -20,6 +21,7 @@ var routes = <String, WidgetBuilder>{
   "/profileDetlais": (BuildContext context) => ProfileDetails(),
   "/product": (BuildContext context) => AddProduct(),
   "/storage": (BuildContext context) => StorageScreen(),
+  "/items": (BuildContext context) => ItemDetails(),
 };
 void main() => runApp(MyApp());
 

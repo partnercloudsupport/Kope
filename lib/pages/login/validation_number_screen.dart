@@ -28,7 +28,6 @@ class _ValidationPhoneNumber extends State<ValidationPhoneNumber> {
   @override
   void initState() {
     super.initState();
-    this.verificationId = Locals.verifyID;
     init();
 //    Timer(Duration(seconds: 10), );
   }
@@ -37,6 +36,7 @@ class _ValidationPhoneNumber extends State<ValidationPhoneNumber> {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       userId = (prefs.getString('userId'));
+      this.verificationId = Locals.verifyID;
     });
   }
 

@@ -375,7 +375,7 @@ class _SignScreenState extends State<SignScreen> {
       this.verificationId = verificationId;
       print(Locals.verifyID);
       setState(() {
-        Locals.verifyID = verificationId;
+        Locals.verifyID = Locals.verifyID;
         user = new User(
             username: username, passwords: password, tel: tel, email: email);
         Locals.number = tel;
