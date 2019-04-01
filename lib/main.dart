@@ -5,6 +5,7 @@ import 'package:kope/pages/login/login_screen.dart';
 import 'package:kope/pages/login/signUp_screen.dart';
 import 'package:kope/pages/login/validation_number_screen.dart';
 import 'package:kope/pages/product/add_product.dart';
+import 'package:kope/pages/product/product_details.dart';
 import 'package:kope/pages/profile/profile_screen.dart';
 import 'package:kope/pages/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ var routes = <String, WidgetBuilder>{
   "/product": (BuildContext context) => AddProduct(),
   "/storage": (BuildContext context) => StorageScreen(),
   "/items": (BuildContext context) => ItemDetails(),
+  "/productDetails": (BuildContext context) => ProductDetails(),
 };
 void main() => runApp(MyApp());
 
@@ -31,6 +33,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         theme: ThemeData(
+          fontFamily: 'Raleway',
             primaryColor: Colors.blue,
             buttonColor: Colors.blue,
             buttonTheme: const ButtonThemeData(

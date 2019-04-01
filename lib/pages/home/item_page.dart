@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:kope/cloud/models/article.dart';
+import 'package:kope/utils/my_navigator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // class ItemDetails extends StatefulWidget {
@@ -109,234 +110,110 @@ class _MyHomePageState extends State<ItemDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: new ListView(children: <Widget>[
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.all(10.0),
-              height: 250.0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Column(
-                    children: <Widget>[
-                      Stack(
-                        children: <Widget>[
-                          Container(
-                            height: 230.0,
-                            width: MediaQuery.of(context).size.width -
-                                MediaQuery.of(context).size.width / 3,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5.0),
-                                image: DecorationImage(
-                                    image: AssetImage('assets/images/back.jpg'),
-                                    fit: BoxFit.cover)),
-                          ),
-                          Positioned(
-                            left: 15.0,
-                            top: 130.0,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                  'Honey Bread',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 30.0,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  '\$88',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20.0,
-                                  ),
-                                )
-                              ],
-                            ),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                  SizedBox(width: 5.0),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Material(
-                        borderRadius: BorderRadius.circular(7.0),
-                        elevation: 2.0,
-                        child: Container(
-                          height: 60.0,
-                          width: 60.0,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(7.0)),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Icon(Icons.favorite, color: Colors.red),
-                              Text(
-                                '368',
-                                style: TextStyle(
-                                    fontSize: 15.0,
-                                    fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      Material(
-                        borderRadius: BorderRadius.circular(7.0),
-                        elevation: 2.0,
-                        child: Container(
-                          height: 60.0,
-                          width: 60.0,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(7.0),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Icon(Icons.chat_bubble,
-                                  color: Colors.grey.withOpacity(0.5)),
-                              Text(
-                                '76',
-                                style: TextStyle(
-                                    fontSize: 15.0,
-                                    fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      Material(
-                        borderRadius: BorderRadius.circular(7.0),
-                        elevation: 2.0,
-                        child: Container(
-                          height: 60.0,
-                          width: 60.0,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(7.0),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Icon(Icons.arrow_forward, color: Colors.grey),
-                              Text(
-                                '18',
-                                style: TextStyle(
-                                    fontSize: 15.0,
-                                    fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            SizedBox(height: 10.0),
-            Padding(
-              padding: const EdgeInsets.only(left: 17.0),
-              child: Text(
-                'Recemment ajoutés',
-                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.left,
-              ),
-            ),
-            SizedBox(height: 10.0),
-            StreamBuilder<QuerySnapshot>(
-                stream: _db
-                    .collection('articles')
-                    .orderBy("create_at", descending: true)
-                    .orderBy("designation", descending: false)
-                    .limit(30)
-                    .snapshots(),
-                builder: (context, snap) {
-                  if (!snap.hasData) return Center(child: Text('Loading....'));
-                  int count = snap.data.documents.length;
-                  return GridView.builder(
-                      itemCount: count,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2),
-                      primary: false,
-                      shrinkWrap: true,
-                      itemBuilder: (BuildContext context, int index) {
-                        art = Article();
-                        String cat;
-                        art.id = snap.data.documents[index].documentID;
-                        // _loadCateorie(
-                        //         snap.data.documents[index].data["categories"])
-                        //     .then((val) {
-                        //   cat = val;
-                        //   // setState(() {
-                        //   //   cat = cat;
-                        //   // });
-                        // });
-                        art.designation =
-                            snap.data.documents[index].data["designation"];
-                        art.prix = snap.data.documents[index].data["prix"];
-                        art.likes = snap.data.documents[index].data["likes"];
-                        art.date = snap.data.documents[index].data["create_at"];
-                        List<dynamic> list = new List.from(
-                            snap.data.documents[index].data["images"]);
-                        art.img = list[0]["image1"];
-                        // art.categorie = cat;
-                        // print(_categorie);
-                        // print(art.categorie);
-                        return product(art);
-                      });
-                }),
-            SizedBox(height: 10.0)
-          ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(top: 17.0, left: 5.0),
+          child: Text(
+            'Recemment ajoutés',
+            style: TextStyle(fontSize: 28.0,fontWeight: FontWeight.bold),
+            textAlign: TextAlign.left,
+          ),
         ),
-      ]),
+        StreamBuilder<QuerySnapshot>(
+            stream: _db
+                .collection('articles')
+                .orderBy("create_at", descending: true)
+                .orderBy("designation", descending: false)
+                .limit(30)
+                .snapshots(),
+            builder: (context, snap) {
+              if (!snap.hasData) return Center(child: Text('Loading....'));
+              int count = snap.data.documents.length;
+              return GridView.builder(
+                  itemCount: count,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2),
+                  primary: false,
+                  shrinkWrap: true,
+                  itemBuilder: (BuildContext context, int index) {
+                    art = Article();
+                    String cat;
+                    art.id = snap.data.documents[index].documentID;
+                    // _loadCateorie(
+                    //         snap.data.documents[index].data["categories"])
+                    //     .then((val) {
+                    //   cat = val;
+                    //   // setState(() {
+                    //   //   cat = cat;
+                    //   // });
+                    // });
+                    art.designation =
+                        snap.data.documents[index].data["designation"];
+                    art.prix = snap.data.documents[index].data["prix"];
+                    art.likes = snap.data.documents[index].data["likes"];
+                    art.date = snap.data.documents[index].data["create_at"];
+                    List<dynamic> list = new List.from(
+                        snap.data.documents[index].data["images"]);
+                    art.img = list[0]["image1"];
+                    // art.categorie = cat;
+                    // print(_categorie);
+                    // print(art.categorie);
+                    return product(art);
+                  });
+            }),
+        SizedBox(height: 10.0),
+      ],
     );
   }
 
   Widget product(Article art) {
-    return Card(
-      elevation: 10,
-      child: InkWell(
-        onTap: () {},
-        child: GridTile(
-          child: Image(
-            image: NetworkImage(art.img),
-            fit: BoxFit.cover,
-          ),
-          footer: Container(
-            color: Colors.white12,
-            child: ListTile(
-              // leading: Text(
-              //   '${art.designation.toUpperCase()}',
-              //   style: TextStyle(
-              //       fontWeight: FontWeight.bold, color: Colors.white70,),
-              // ),
-              subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text('${art.designation.toUpperCase()}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white70,
-                        )),
-                    
-                    Text('${art.prix}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white70,
-                        )),
-                    Text('${art.date}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white70,
-                        ))
-                  ]),
-              // title: Text('${art.categorie}'),
+    return Padding(
+      padding: const EdgeInsets.only(left:5.0, right: 5.0),
+      child: Card(
+        elevation: 10,
+        child: InkWell(
+          onTap: () {
+            MyNavigator.gotTo(context, "/productDetails");
+          },
+          child: GridTile(
+            child: Image(
+              // image: NetworkImage(art.img),
+              image: NetworkImage("https://marketing.fitbit.com/images/store/products-retina/versa/versa-lite-mulberry-mulberry-aluminum-side-mobile-90935f9749466b0f012f193e65f5a83c.png"),
+              fit: BoxFit.cover,
+            ),
+            footer: Container(
+              color: Colors.white12,
+              child: ListTile(
+                // leading: Text(
+                //   '${art.designation.toUpperCase()}',
+                //   style: TextStyle(
+                //       fontWeight: FontWeight.bold, color: Colors.white70,),
+                // ),
+                subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text('${art.designation}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          )),
+                      
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text('${art.prix} Fc',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.purple,
+                          )),
+                          Icon(Icons.favorite_border, color: Colors.red,)
+                        ],
+                      )
+                    ]),
+                // title: Text('${art.categorie}'),
+              ),
             ),
           ),
         ),
