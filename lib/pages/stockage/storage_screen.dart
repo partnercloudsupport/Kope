@@ -71,7 +71,7 @@ class _StorageScreenState extends State<StorageScreen> {
                     List<dynamic> list = new List.from(_doc[index].data["images"]);
                     art.img =  list[0]["image1"];
                     // print("Les valeurs ${list[0]["image1"]}");
-                    return articleCard(article: art);
+                    return ArticleCard(article: art);
                   }),
             ],
           )),
@@ -128,24 +128,11 @@ class _StorageScreenState extends State<StorageScreen> {
     });
   }
 }
-//   Future<String> _loadCateorie(String key) async {
-//     await _db
-//         .collection('categories')
-//         .document(key)
-//         .get()
-//         .then((DocumentSnapshot doc) {
-//       if (doc.exists) {
-//         _categorie = doc["name"];
-//       }
-//     });
-//     return _categorie;
-//   }
-// }
 
-class articleCard extends StatelessWidget {
+class ArticleCard extends StatelessWidget {
   final Article article;
 
-  const articleCard({this.article});
+  const ArticleCard({this.article});
   @override
   Widget build(BuildContext context) {
     return Padding(

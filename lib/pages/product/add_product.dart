@@ -9,6 +9,7 @@ import 'package:kope/cloud/locals/locals.dart';
 import 'package:kope/pages/widgets/animation/loading.dart';
 import 'package:kope/pages/widgets/custom_drop_down_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image/image.dart' as Io;
 
 class AddProduct extends StatefulWidget {
   @override
@@ -20,6 +21,7 @@ class _AddProductState extends State<AddProduct> {
   String categorie, _desc, _designation, _prix;
   List<String> _categorieList, _categorieKey;
   List<File> _image = List<File>();
+  List<File> _imageR = List<File>();
   final PageController ctrl = PageController(viewportFraction: 0.8);
   Firestore _db = Firestore.instance;
   bool _isComplete, _isLoad = false;
@@ -68,8 +70,15 @@ class _AddProductState extends State<AddProduct> {
         ? await ImagePicker.pickImage(source: ImageSource.camera)
         : await ImagePicker.pickImage(source: ImageSource.gallery);
     if (img != null) {
-      _image.add(img);
+      
+      Io.Image ima = Io.copyResize(Io.decodeImage(img.readAsBytesSync()), 200);
+      print("La taille reduite ${ima.data.length}");
+      print("La taille reduite ${img.lengthSync()}");
 
+      Image imag = Image.memory(ima.getBytes());
+      // imag.image.
+      // _imageR.add(File.);
+      _image.add(img);
       setState(() {
         _limitP = _limitP - 1;
       });

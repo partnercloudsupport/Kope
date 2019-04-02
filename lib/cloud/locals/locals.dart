@@ -1,6 +1,8 @@
+
 import 'package:flutter/material.dart';
 import 'package:kope/cloud/models/user.dart';
 import 'package:photo_manager/photo_manager.dart';
+
 
 class Locals {
   static User user;
@@ -28,7 +30,15 @@ class Locals {
       return null;
     }
   }
-
+  // static Future<File> getCompressImage(File image) async{
+  //   ImageProperties properties = await FlutterNativeImage.getImageProperties(image.path);
+  //   File compressedFile = await FlutterNativeImage.compressImage(image.path, quality: 80, 
+  //   targetWidth: 600, 
+  //   targetHeight: (properties.height * 600 / properties.width).round());
+  //   print("image first size ${image.length()}");
+  //   print("image second size ${compressedFile.length()}");
+  //   return image;
+  // }
   static showSuccess(BuildContext context) {
     return showDialog(
         context: context,

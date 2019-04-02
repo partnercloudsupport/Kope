@@ -1,5 +1,5 @@
 name: kope
-description: A new Flutter project.
+description: Mobile App
 
 version: 1.0.0+1
 
@@ -22,6 +22,10 @@ dependencies:
   country_code_picker:
   uuid:
   carousel_pro:
+  url_launcher: ^5.0.2 
+  image: ^2.0.7
+  # flutter_native_image:
+  #   git: https://github.com/btastic/flutter_native_image.git
   #multi_image_picker:
     
 dev_dependencies:
