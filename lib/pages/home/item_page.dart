@@ -1,34 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:kope/cloud/models/article.dart';
-import 'package:kope/utils/my_navigator.dart';
+import 'package:kope/pages/product/product_details.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// class ItemDetails extends StatefulWidget {
-//   @override
-//   _ItemDetailsState createState() => _ItemDetailsState();
-// }
-
-// class _ItemDetailsState extends State<ItemDetails> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Column(
-//         children: <Widget>[
-//           Container(
-//             height: 400,
-//             child: Column(
-//               children: <Widget>[
-//                 Text('Text'),
-
-//               ],
-//             ),
-//           )
-//         ],
-//       ),
-//     );
-//   }
-// }
 
 class ItemDetails extends StatefulWidget {
   @override
@@ -37,17 +12,14 @@ class ItemDetails extends StatefulWidget {
 
 class _MyHomePageState extends State<ItemDetails> {
   SharedPreferences prefs;
-  String uid, _designation, _categorie, _img;
-  double _likes;
-  List<DocumentSnapshot> _docs = new List();
+  String uid;
   Firestore _db = Firestore.instance;
   Article art = Article();
-  Stream _stream;
+
 
   @override
   void initState() {
     super.initState();
-    _load();
     init();
   }
 
@@ -56,56 +28,6 @@ class _MyHomePageState extends State<ItemDetails> {
     setState(() {
       uid = (prefs.getString('userId'));
     });
-    _loadData();
-  }
-
-  Future _loadData() async {
-    //TODO:update load data
-    await _db
-        .collection('articles')
-        .orderBy("create_at", descending: true)
-        .orderBy("designation", descending: false)
-        .limit(30)
-        .getDocuments()
-        .then((QuerySnapshot query) {
-      if (query.documents.isNotEmpty) {
-        _docs = query.documents;
-      }
-    });
-    setState(() {
-      _docs = _docs;
-    });
-  }
-
-  Stream _load() {
-    //TODO:update load data
-    Query query = _db
-        .collection('articles')
-        .orderBy("create_at", descending: true)
-        .orderBy("designation", descending: false)
-        .limit(30);
-
-    _stream =
-        query.snapshots().map((list) => list.documents.map((doc) => doc.data));
-  }
-
-  Future<String> _loadCateorie(String key) async {
-    await _db
-        .collection('categories')
-        .document(key)
-        .get()
-        .then((DocumentSnapshot doc) {
-      if (doc.exists) {
-        _categorie = doc["name"];
-      }
-    });
-    // setState(() {_categorie = _categorie;});
-    return _categorie;
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override
@@ -175,7 +97,8 @@ class _MyHomePageState extends State<ItemDetails> {
         elevation: 10,
         child: InkWell(
           onTap: () {
-            MyNavigator.gotTo(context, "/productDetails");
+            // MyNavigator.gotTo(context, "/productDetails");
+            Navigator.push(context, new MaterialPageRoute(builder: (context)=>new ProductDetails(id:art.id)));
           },
           child: GridTile(
             child: Image(

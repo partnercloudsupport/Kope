@@ -237,7 +237,7 @@ class _HomeScreenState extends State<HomeScreen>
               : Carousel(
                   boxFit: BoxFit.contain,
                   images: getImages(),
-                  autoplay: true,
+                  autoplay: false,
                   animationCurve: Curves.fastLinearToSlowEaseIn,
                   animationDuration: Duration(milliseconds: 5000),
                   dotSize: 4.0,
