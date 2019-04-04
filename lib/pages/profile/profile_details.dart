@@ -99,7 +99,7 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                     height: 25.0,
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.only(left:50.0),
                     child: Text(addresse == null ? "Adresse" : addresse),
                   ),
                   SizedBox(

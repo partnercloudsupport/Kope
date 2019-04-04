@@ -232,12 +232,11 @@ class _AddProductState extends State<AddProduct> {
                             children: <Widget>[
                               Row(
                                 children: <Widget>[
-                                  Icon(Icons.category),
+                                  Icon(Icons.category, color: Colors.grey),
                                   SizedBox(
                                     width: 10.0,
                                   ),
-                                  Text('Categorie'),
-                                  Spacer(),
+                                  SizedBox(width: 5.0),
                                   CustomDropdownButton(
                                     value: categorie,
                                     items: _categorieList,

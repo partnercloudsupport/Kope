@@ -77,18 +77,19 @@ class _HomeScreenState extends State<HomeScreen>
             UserAccountsDrawerHeader(
               currentAccountPicture: _img == null
                   ? CircleAvatar(child: Text('N'))
-                  : Material(
-                      elevation: 10.0,
-                      borderRadius: BorderRadius.circular(50.0),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                          image: NetworkImage(_img),
-                          fit: BoxFit.cover,
-                        )),
-                      ),
-                    ),
+                  // : Material(
+                  //     elevation: 10.0,
+                  //     borderRadius: BorderRadius.circular(50.0),
+                  //     child: Container(
+                  //       width: MediaQuery.of(context).size.width,
+                  //       decoration: BoxDecoration(
+                  //           image: DecorationImage(
+                  //         image: NetworkImage(_img),
+                  //         fit: BoxFit.cover,
+                  //       )),
+                  //     ),
+                  //   ),
+                  : CircleAvatar(backgroundImage: NetworkImage(_img)),
               accountName: Text(_username == null ? 'Username' : _username),
               accountEmail: Text(_email == null ? 'Email' : _email),
             ),
