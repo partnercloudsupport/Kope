@@ -13,7 +13,17 @@ class _ProfileDetailsState extends State<ProfileDetails> {
   // SizedBox buildLoginButton(BuildContext context) {}
 
   SharedPreferences prefs;
-  String uid, username, nom, addresse, profession, tel, email, _img, ville;
+  String uid,
+      username,
+      nom,
+      addresse,
+      profession,
+      tel,
+      email,
+      _img,
+      ville,
+      pays,
+      province;
   Firestore firestore;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   // BuildContext context;
@@ -98,10 +108,15 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                   SizedBox(
                     height: 25.0,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left:50.0),
-                    child: Text(addresse == null ? "Adresse" : addresse),
+                  Text(pays == null ? "Pays" : pays),
+                  SizedBox(
+                    height: 25.0,
                   ),
+                  Text(province == null ? "Province" : province),
+                  SizedBox(
+                    height: 25.0,
+                  ),
+                  Text(ville == null ? "Ville" : ville),
                   SizedBox(
                     height: 25.0,
                   ),
@@ -141,11 +156,8 @@ class _ProfileDetailsState extends State<ProfileDetails> {
       ),
       body: ListView(
         children: <Widget>[
-          SizedBox(height: MediaQuery.of(context).size.height / 8),
-          Container(
-            height: 450.0,
-            child: bodyWidget(context),
-          )
+          SizedBox(height: MediaQuery.of(context).size.height / 12),
+          bodyWidget(context)
         ],
       ),
     );
@@ -163,8 +175,9 @@ class _ProfileDetailsState extends State<ProfileDetails> {
         username = query.data["username"];
         profession = query.data["profession"];
         nom = query.data["nom"];
-        addresse = query.data["province"];
+        province = query.data["province"];
         ville = query.data["ville"];
+        // pays = query.data["pays"];
         tel = query.data["tel"];
         email = query.data["email"];
         _img = query.data["imagePath"];
@@ -174,8 +187,10 @@ class _ProfileDetailsState extends State<ProfileDetails> {
       username = username;
       profession = profession;
       nom = nom;
+      pays = pays;
+      province = province;
       addresse = addresse;
-      _loadAddresse(addresse);
+      _loadAddresse(province);
       ville = ville;
       tel = tel;
       email = email;
@@ -192,7 +207,7 @@ class _ProfileDetailsState extends State<ProfileDetails> {
         .then((DocumentSnapshot query) {
       if (query.exists) {
         addresse = ville;
-        addresse = addresse + ", " + query.data["name"];
+        province = query.data["name"];
         key = query.data["pays"];
       }
     }).catchError((e) {
@@ -201,7 +216,7 @@ class _ProfileDetailsState extends State<ProfileDetails> {
           "Une erreur s'est produite reessayer", _scaffoldKey);
     });
     setState(() {
-      addresse = addresse;
+      pays = pays;
       if (key != null) _loadPays(key);
     });
   }
@@ -213,7 +228,7 @@ class _ProfileDetailsState extends State<ProfileDetails> {
         .get()
         .then((DocumentSnapshot query) {
       if (query.exists) {
-        addresse = addresse + ", " + query.data["name"];
+        pays = query.data["name"];
       }
     }).catchError((e) {
       print(e);
@@ -221,7 +236,7 @@ class _ProfileDetailsState extends State<ProfileDetails> {
           "Une erreur s'est produite reessayer", _scaffoldKey);
     });
     setState(() {
-      addresse = addresse;
+      pays = pays;
     });
   }
 }

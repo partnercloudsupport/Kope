@@ -68,8 +68,9 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    Color themeColor = Theme.of(context).primaryColor;
     return Scaffold(
-      appBar: _index != 2 ? new AppBar(title: Center(child: Text('Kope'))) : null,
+      appBar: _index != 0 ? new AppBar(title: Center(child: Text('Kope'))) : null,
       drawer: new Drawer(
         elevation: 10.0,
         child: Column(
@@ -142,49 +143,49 @@ class _HomeScreenState extends State<HomeScreen>
         type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(
-              icon: Icon(Icons.settings,
-                  color: _index == 0 ? Color(0xFFE52020) : null),
-              title: Text("Settings",
+              icon: Icon(Icons.home,
+                  color: _index == 0 ? themeColor : null),
+              title: Text("Acceuil",
                   style: TextStyle(
-                      color: _index == 0 ? Color(0xFFE52020) : null))),
+                      color: _index == 0 ? themeColor : null))),
           BottomNavigationBarItem(
               icon: Icon(
-                Icons.help,
-                color: _index == 1 ? Color(0xFFE52020) : null,
+                Icons.search,
+                color: _index == 1 ? themeColor : null,
               ),
-              title: Text("Help",
+              title: Text("Recherche",
                   style: TextStyle(
-                      color: _index == 1 ? Color(0xFFE52020) : null))),
+                      color: _index == 1 ? themeColor : null))),
           BottomNavigationBarItem(
               icon: Icon(
-                Icons.home,
-                color: _index == 2 ? Color(0xFFE52020) : null,
+                Icons.notifications,
+                color: _index == 2 ? themeColor : null,
               ),
               title: Text(
-                "Home",
-                style: TextStyle(color: _index == 2 ? Color(0xFFE52020) : null),
+                "Notification",
+                style: TextStyle(color: _index == 2 ? themeColor : null),
               )),
           BottomNavigationBarItem(
               icon: Icon(
-                Icons.person,
-                color: _index == 3 ? Color(0xFFE52020) : null,
+                Icons.shopping_cart,
+                color: _index == 3 ? themeColor : null,
               ),
               title: Text(
-                "Profile",
-                style: TextStyle(color: _index == 3 ? Color(0xFFE52020) : null),
+                "Petits Travaux",
+                style: TextStyle(color: _index == 3 ? themeColor : null),
               )),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.explore,
-                color: _index == 4 ? Color(0xFFE52020) : null,
-              ),
-              title: Text(
-                "Explore",
-                style: TextStyle(color: _index == 4 ? Color(0xFFE52020) : null),
-              ))
+          // BottomNavigationBarItem(
+          //     icon: Icon(
+          //       Icons.explore,
+          //       color: _index == 4 ? Color(0xFFE52020) : null,
+          //     ),
+          //     title: Text(
+          //       "Explore",
+          //       style: TextStyle(color: _index == 4 ? Color(0xFFE52020) : null),
+          //     ))
         ],
       ),
-      body: _index == 2
+      body: _index == 0
           ? CustomScrollView(
               slivers: <Widget>[
                 builAppBar(),
@@ -248,17 +249,17 @@ class _HomeScreenState extends State<HomeScreen>
 
   TabBarView buildTabBar() {
     return TabBarView(controller: _controller, children: <Widget>[
-      new Container(
-        child: new Center(child: Text('1')),
-      ),
-      new Container(
-        child: new Center(child: Text('Lorem Ipsum')),
-      ),
       new ItemDetails(),
       new Container(
-        child: new Center(child: Text('...')),
+        child: new Center(child: Text('Rechercher')),
       ),
-      new CategorieMenu(),
+      new Container(
+        child: new Center(child: Text('Notification')),
+      ),
+       new Container(
+        child: new Center(child: Text('Petits Travaux')),
+      ),
+     // new CategorieMenu(),
     ]);
   }
 }

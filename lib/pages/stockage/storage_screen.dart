@@ -142,46 +142,44 @@ class ArticleCard extends StatelessWidget {
           borderRadius: BorderRadius.all(
             Radius.circular(10.0),
           ),
-          border: Border.all(color: Colors.grey),
+        //  border: Border.all(color: Colors.grey),
         ),
-        child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
+        child: Row(
+          children: <Widget>[
+            Material(
+              elevation: 10.0,
+              child: Container(
+                height: 110.0,
+                width: 150.0,
+                child: Image(
+                  image: NetworkImage(article.img),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 20.0,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Material(
-                  elevation: 10.0,
-                  child: Container(
-                    height: 100.0,
-                    width: 100.0,
-                    child: Image(
-                      image: NetworkImage(article.img),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 20.0,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
                   children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Text(
-                          "${article.designation}",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0,
-                          ),
-                        )
-                      ],
-                    ),
-                    FlightDetailChip(Icons.monetization_on, '${article.prix}'),
-                    FlightDetailChip(Icons.favorite, '${article.likes}')
+                    Text(
+                      "${article.designation}",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
+                      ),
+                    )
                   ],
-                )
+                ),
+                FlightDetailChip(Icons.monetization_on, '${article.prix}'),
+                FlightDetailChip(Icons.favorite, '${article.likes}')
               ],
-            )),
+            )
+          ],
+        ),
       ),
     );
   }

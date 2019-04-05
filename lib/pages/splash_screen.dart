@@ -42,11 +42,11 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          // Container(
-          //   decoration: BoxDecoration(color: Colors.redAccent,
+         //  Container(
+         //   decoration: BoxDecoration(color: Colors.blueAccent,
           //       image: DecorationImage(image: AssetImage("assets/images/back.jpg"), fit: BoxFit.cover)
-          //   ),
-          // ),
+         //  ),
+         // ),
           Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
@@ -67,7 +67,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       Text(
                         Flutkart.name,
                         style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black,
                             fontWeight: FontWeight.normal,
                             fontSize: 14.0),
                       )
@@ -99,7 +99,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       style: TextStyle(
                           fontWeight: FontWeight.normal,
                           fontSize: 10.0,
-                          color: Colors.white),
+                          color: Colors.black),
                     )
                   ],
                 ),
